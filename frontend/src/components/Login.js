@@ -1,22 +1,32 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { hasAccount, signInUser, createUser } from '../firebase/auth';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
-    navigate('/main');
+    try {
+      const accountExists = await hasAccount(email);
+      if (accountExists) {
+        await signInUser(email, password);
+      } else {
+        await createUser(email, password);
+      }
+      navigate('/main');
+    } catch (error) {
+      console.error('Error during authentication:', error);
+      alert('Error during authentication. Please check your credentials.');
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-      <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-400 text-transparent bg-clip-text animate-gradient">Login</h2>
+        <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-400 text-transparent bg-clip-text animate-gradient">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -53,6 +63,12 @@ const Login = () => {
             </button>
           </div>
         </form>
+        <p className="text-center text-gray-600 mt-4">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-blue-500 hover:text-blue-700">
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   );
