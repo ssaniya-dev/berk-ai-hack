@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const Main = () => {
   const [transcript, setTranscript] = useState('');
+  const [completeTranscript, setCompleteTranscript] = useState('');
   const videoRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const constraints = {
@@ -47,12 +49,27 @@ const Main = () => {
           console.log('Speech recognition service disconnected');
         };
 
-        recognition.start();
+        recognitionRef.current = recognition;
       })
       .catch((err) => {
         console.error('Error accessing media devices.', err);
       });
   }, []);
+
+  const handleMouseDown = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.start();
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      console.log('Transcript:', transcript.trim());
+      setCompleteTranscript((prevTranscript) => prevTranscript + transcript);
+      setTranscript('');
+    }
+  };
 
   return (
     <div className="flex flex-col bg-gray-900 items-center justify-center min-h-screen p-4 font-montserrat">
@@ -66,10 +83,13 @@ const Main = () => {
           className="w-full h-full object-cover"
         ></video>
       </div>
-      <div className="text-white mt-4">
-        <h2 className="text-xl font-bold">Transcript:</h2>
-        <p>{transcript}</p>
-      </div>
+      <button
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-full"
+      >
+        Push to Talk
+      </button>
     </div>
   );
 };
