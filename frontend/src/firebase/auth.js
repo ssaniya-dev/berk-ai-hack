@@ -10,18 +10,14 @@ export async function createUser(email, password) {
 }
 
 export async function signInUser(email, password) {
-  return signInWithEmailAndPassword(auth, email, password);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch {
+    alert("Invalid email or password");
+    throw new Error("Invalid email or password");
+  }
 }
 
 export async function signOutUser() {
   return signOut(auth);
-}
-
-export async function hasAccount(email, password) {
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    return true;
-  } catch (error) {
-    return false;
-  }
 }
