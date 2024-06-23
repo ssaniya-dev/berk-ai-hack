@@ -57,7 +57,7 @@ const Main = () => {
   return (
     <div className="flex flex-col bg-gray-900 items-center justify-center min-h-screen p-4 font-montserrat">
       <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-400 text-transparent bg-clip-text animate-gradient">
-        WhatsUp name!
+        WhatsUp!
       </h1>
       <div className="border-4 rounded-lg overflow-hidden shadow-lg max-w-4xl max-h-3xl">
         <video
