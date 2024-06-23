@@ -1,9 +1,12 @@
-import './App.css';
-import Main from './components/Main';
+import "./App.css";
+import Main from "./components/Main";
+import { AuthProvider } from "./contexts/authContext";
 
 function App() {
   return (
-      <Main/>
+    <AuthProvider>
+      <Main />
+    </AuthProvider>
   );
 }
 
