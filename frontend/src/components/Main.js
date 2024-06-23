@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Main = () => {
+  const [transcript, setTranscript] = useState('');
   const videoRef = useRef(null);
-  const audioRef = useRef(null);
 
   useEffect(() => {
     const constraints = {
@@ -15,6 +15,39 @@ const Main = () => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          console.error('Browser does not support Speech Recognition API');
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+          let interimTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcriptSegment = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              setTranscript((prevTranscript) => prevTranscript + transcriptSegment + ' ');
+            } else {
+              interimTranscript += transcriptSegment;
+            }
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error detected: ' + event.error);
+        };
+
+        recognition.onend = () => {
+          console.log('Speech recognition service disconnected');
+        };
+
+        recognition.start();
       })
       .catch((err) => {
         console.error('Error accessing media devices.', err);
@@ -33,7 +66,10 @@ const Main = () => {
           className="w-full h-full object-cover"
         ></video>
       </div>
-      <audio ref={audioRef} autoPlay className="hidden"></audio>
+      <div className="text-white mt-4">
+        <h2 className="text-xl font-bold">Transcript:</h2>
+        <p>{transcript}</p>
+      </div>
     </div>
   );
 };
